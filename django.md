@@ -240,3 +240,146 @@ entry.save()
 entry= Entry.objects.get(pk=1) 
 entry.delete()
 ```
+## ORM Queries (Django)
+
+## QuerySets
+```python
+Person.objects.values('name')
+Person.objects.values_list('name')
+Person.objects.values_list('name',flat=True)
+Person.objects.values_list('name',flat=True).filter(name__contains="p")
+```
+### Where
+```python
+Membership.objects.get(id__exact=1)
+Membership.objects.get(id__iexact=1)  ##Case Sensitive
+```
+### Distinct
+```python
+Membership.objects.distinct('membership_plan')
+```
+### Like | Contains | Starts with
+```python
+Person.objects.filter(name__contains="pram")
+Person.objects.get(name__icontains='Pram')
+Person.objects.filter(name__startswith='Pram')
+Person.objects.filter(name__istartswith='Pram') ##Case Sensitive
+Person.objects.filter(name__endswith='Lennon')
+Person.objects.filter(name__iendswith='Lennon') ##Case Sensitive
+```
+### IN
+```python
+Person.objects.filter(id__in=[1, 3])
+```
+### gt | gte | eq | lt | lte
+```python
+Person.objects.filter(id__gt=4)
+Person.objects.filter(id__gte=4)
+Person.objects.filter(id__eq=4)
+Person.objects.filter(id__lt=4)
+Person.objects.filter(id__lte=4)
+```
+### Range
+```python
+import datetime
+start_date = datetime.date(2005, 1, 1)
+end_date = datetime.date(2005, 3, 31)
+Person.objects.filter(pub_date__range=(start_date, end_date))
+```
+### Date | Year | Month | Day | Week | Quater | Time 
+```python
+Entry.objects.filter(pub_date__date=datetime.date(2005, 1, 1))
+Entry.objects.filter(pub_date__date__gt=datetime.date(2005, 1, 1))
+
+Entry.objects.filter(pub_date__year=2005)
+Entry.objects.filter(pub_date__year__gte=2005)
+
+Entry.objects.filter(pub_date__iso_year=2005) ## iso year
+Entry.objects.filter(pub_date__iso_year__gte=2005) ## iso year
+
+Entry.objects.filter(pub_date__month=12)  	## Month
+Entry.objects.filter(pub_date__month__gte=6)	## Month
+
+Entry.objects.filter(pub_date__day=3)		## Day
+Entry.objects.filter(pub_date__day__gte=3)	## Day
+
+Entry.objects.filter(pub_date__week=52)		## Week
+Entry.objects.filter(pub_date__week__gte=32, pub_date__week__lte=38) ## Week
+
+Entry.objects.filter(pub_date__week_day=2)	##Weeekday
+Entry.objects.filter(pub_date__week_day__gte=2) ##Weeekday
+
+Entry.objects.filter(pub_date__quarter=2)  #Quater
+
+Entry.objects.filter(pub_date__time=datetime.time(14, 30))  ##Time
+Entry.objects.filter(pub_date__time__range=(datetime.time(8), datetime.time(17))) ##Time
+
+Event.objects.filter(timestamp__hour=23)	## Hour
+Event.objects.filter(time__hour=5)		## Hour
+Event.objects.filter(timestamp__hour__gte=12)	## Hour
+
+Event.objects.filter(timestamp__minute=29)	## Minute
+Event.objects.filter(time__minute=46)		## Minute
+Event.objects.filter(timestamp__minute__gte=29)	## Minute
+
+Event.objects.filter(timestamp__second=31)	## Second
+Event.objects.filter(time__second=2)		## Second
+Event.objects.filter(timestamp__second__gte=31)	## Second
+```
+### Null
+```python
+Entry.objects.filter(pub_date__isnull=True)
+```
+### Regex
+```python
+Entry.objects.get(title__regex=r'^(An?|The) +')
+Entry.objects.get(title__iregex=r'^(an?|the) +') ## Case sensitive
+```
+
+## Aggregation
+
+### Count | Average | Max
+```python
+Book.objects.count()		## Count
+Book.objects.filter(publisher__name='BaloneyPress').count() ## Count
+
+from django.db.models import Avg, Max, FloatField
+
+Book.objects.all().aggregate(Avg('price'))	## Avg
+
+Book.objects.all().aggregate(Max('price'))	## Max
+
+Book.objects.aggregate(price_diff=Max('price', output_field=FloatField()) - Avg('price'))  ## FloatField
+```
+### Count 
+```python
+# Each publisher, each with a count of books as a "num_books" attribute.
+from django.db.models import Count
+pubs = Publisher.objects.annotate(num_books=Count('book'))
+
+# Each publisher, with a separate count of books with a rating above and below 5
+from django.db.models import Q
+above_5 = Count('book', filter=Q(book__rating__gt=5))
+below_5 = Count('book', filter=Q(book__rating__lte=5))
+pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
+pubs[0].above_5
+pubs[0].below_5
+
+# The top 5 publishers, in order by number of books.
+pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]`
+```
+
+https://docs.djangoproject.com/en/2.2/ref/models/querysets/#exact
+https://docs.djangoproject.com/en/2.2/topics/db/aggregation/
+
+
+
+
+
+
+
+
+
+
+
+
