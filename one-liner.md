@@ -5,11 +5,19 @@ s = "Python"
 s[::-1]
 > nohtyP
 ```
+### Two nums
+```python 
+num[::2]
+``` 
 ### Factorial
 ```python
 fact = lambda x: 1 if x == 0 else x * fact(x-1)
 fact(5)
 > 120
+```
+### Fibonacci
+```python
+lambda x: x if x<=1 else fib(x-1) + fib(x-2)
 ```
 ### Palindrome
 ```python
@@ -36,7 +44,15 @@ list(mergeSort(arr))
 ```python 
 lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
 ```
+### Binary Search
+```python
+def binarySearch(arr,x,l,r):
+    if r >= l:
+        mid = int(l + (r - l)/2)
+        return mid if arr[mid] == x else binarySearch(arr,x, l, mid-1) if arr[mid] > x else binarySearch(arr,x, mid + 1, r) if arr[mid] < x else -1
+    else:
+        return -1
+```
 
-num[::2]
 
 https://wiki.python.org/moin/Powerful%20Python%20One-Liners
